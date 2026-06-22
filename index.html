@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>배드민턴 토너먼트 대진표 발전기</title>
+    <title>토너먼트 대진표 생성기</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -54,7 +54,7 @@
                     <i data-lucide="sparkles" class="w-7 h-7 text-yellow-300"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold tracking-tight">배드민턴 토너먼트 대진표 발전기</h1>
+                    <h1 class="text-xl font-extrabold tracking-tight">토너먼트 대진표 생성기</h1>
                     <p class="text-xs text-indigo-100 mt-0.5">1~3학년 전체 명렬표 내장 • 남녀 동시 생성 • A4 가로 2페이지 인쇄</p>
                 </div>
             </div>
@@ -1625,7 +1625,7 @@ const studentDatabase = [
                 card.innerHTML = `<div class="flex items-center truncate prevent-clip">${numBadge}<span class="truncate text-slate-900 prevent-clip">${item.name}</span></div>`;
             } else {
                 card.className = "w-full bg-slate-50 text-slate-300 border border-dashed border-slate-200 rounded p-1 text-[9px] text-center prevent-clip h-[28px] flex items-center justify-center";
-                card.innerText = "대기생";
+                card.innerText = "대기자";
             }
             slotContainer.appendChild(card); col.appendChild(slotContainer);
         });

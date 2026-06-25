@@ -34,33 +34,6 @@
         @page portrait-page  { size: A4 portrait;  margin:0; }
         #print-pages-container { display:none; }
 
-        /* 캡처 품질 & 글자 잘림 방지 */
-* {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.print-page {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-#bracket-print-area-m,
-#bracket-print-area-f,
-#league-print-area-m,
-#league-print-area-f,
-#doubles-print-area-m,
-#doubles-print-area-f {
-    overflow: visible !important;
-    transform: scale(1);
-}
-
-/* 텍스트 잘림 방지 */
-div, span {
-    line-height: 1.3 !important;
-    word-break: keep-all;
-}
         /* 리그전 B 레이아웃 */
         .league-col-grid { display: grid; gap: 2px; }
         .league-col-header {
@@ -2509,7 +2482,7 @@ function printDoubles() {
 
 /* ════════ 인쇄 ════════ */
 async function printBoth(mode) {
-    const isLandscape = (mode === 'tournament' || mode === 'league' || mode === 'doubles');
+    const isLandscape = mode === 'tournament';
     const areaIds = isLandscape
         ? ['bracket-print-area-m','bracket-print-area-f']
         : ['league-print-area-m','league-print-area-f'];
@@ -2537,24 +2510,9 @@ async function printBothAreas(areaId1, areaId2, isLandscape, labels) {
         for (let i=0;i<2;i++) {
             msg.innerText = (i===0?labels[0]:labels[1]);
             const areaId = i===0 ? areaId1 : areaId2;
-            const element = document.getElementById(areaId);
-
-const canvas = await html2canvas(element, {
-    scale: window.devicePixelRatio * 2, // 해상도 ↑
-    useCORS: true,
-    backgroundColor: '#ffffff',
-    logging: false,
-
-    width: element.scrollWidth,
-    height: element.scrollHeight,
-
-    windowWidth: element.scrollWidth,
-    windowHeight: element.scrollHeight,
-
-    scrollX: 0,
-    scrollY: 0
-});
-
+            const canvas = await html2canvas(document.getElementById(areaId),{
+                scale:2, useCORS:true, backgroundColor:'#ffffff', logging:false
+            });
             document.getElementById(`print-img-${i+1}`).src = canvas.toDataURL('image/png');
         }
         loader.classList.add('hidden'); loader.classList.remove('flex');

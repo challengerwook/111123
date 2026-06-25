@@ -6,6 +6,7 @@
     <title>대진표 생성기</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
         body { font-family: 'Pretendard', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -13,38 +14,26 @@
         .tab-active   { background:#4f46e5; color:#fff; border-color:#4f46e5; }
         .tab-inactive { background:#fff; color:#475569; border-color:#e2e8f0; }
 
- @media print {
-            @page { margin: 10mm; size: auto; }
+        @media print {
+            @page { margin: 0; }
             body  { margin:0; padding:0; background:white; }
             .no-print { display:none !important; }
-            /* 모든 출력 섹션 기본 숨김 */
-            #output-tournament,
-            #output-league,
-            #output-doubles { display:none !important; }
-            /* body에 붙은 클래스에 따라 해당 섹션만 표시 */
-            body.print-tournament #output-tournament { display:flex !important; }
-            body.print-league    #output-league     { display:flex !important; }
-            body.print-doubles   #output-doubles    { display:flex !important; }
-            /* 각 대진표 영역을 별도 페이지로 */
-            .print-area-page {
-                page-break-after: always;
-                page-break-inside: avoid;
-                break-after: page;
+            .print-page {
+                display:block !important;
+                width:100vw; height:100vh;
+                page-break-after:always;
+                page-break-inside:avoid;
             }
-            .print-area-page:last-of-type { page-break-after: auto; break-after: auto; }
-            /* 출력 섹션 내 상단 컨트롤 바 숨김 */
-            #output-tournament > div:first-child,
-            #output-league > div:first-child,
-            #output-doubles > div.no-print { display:none !important; }
-            /* 복식: 입력/팀편성 숨기고 대진표만 출력 */
-            #doubles-input-section,
-            #doubles-teams-section { display:none !important; }
-            #doubles-output-section {
-                display:flex !important;
-                flex-direction:column;
-                gap:1.5rem;
-            }
+            .print-page:last-child { page-break-after:auto; }
+            #print-pages-container { display:block !important; }
+            #app-container { display:none !important; }
         }
+        .page-landscape { page: landscape-page; }
+        @page landscape-page { size: A4 landscape; margin:0; }
+        .page-portrait  { page: portrait-page; }
+        @page portrait-page  { size: A4 portrait;  margin:0; }
+        #print-pages-container { display:none; }
+
         /* 리그전 B 레이아웃 */
         .league-col-grid { display: grid; gap: 2px; }
         .league-col-header {
@@ -88,6 +77,15 @@
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+<div id="print-pages-container">
+    <div class="print-page" id="print-page-1">
+        <img id="print-img-1" src="" style="width:100%;height:100%;object-fit:contain;display:block;" />
+    </div>
+    <div class="print-page" id="print-page-2">
+        <img id="print-img-2" src="" style="width:100%;height:100%;object-fit:contain;display:block;" />
+    </div>
+</div>
 
 <div id="app-container" class="flex flex-col min-h-screen">
 
@@ -206,7 +204,7 @@
                     </button>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-blue-200 flex flex-col" class="... flex flex-col print-area-page" id="bracket-print-area-m">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-blue-200 flex flex-col" id="bracket-print-area-m">
                 <div class="text-center border-b border-slate-300 pb-3 mb-4">
                     <span class="text-[9px] font-bold text-blue-600 tracking-widest border border-blue-200 bg-blue-50 px-2 py-0.5 rounded-full">남자부 · BADMINTON SINGLE ELIMINATION</span>
                     <h2 id="print-title-m" class="text-xl font-extrabold text-slate-900 mt-1"></h2>
@@ -220,7 +218,7 @@
                 </div>
                 <div class="mt-4 pt-2 border-t border-slate-200 text-center text-[9px] text-slate-400">싱글 엘리미네이션 양방향 대치 구조 · A4 가로 출력</div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-pink-200 flex flex-col" class="... flex flex-col print-area-page" id="bracket-print-area-f">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-pink-200 flex flex-col" id="bracket-print-area-f">
                 <div class="text-center border-b border-slate-300 pb-3 mb-4">
                     <span class="text-[9px] font-bold text-pink-600 tracking-widest border border-pink-200 bg-pink-50 px-2 py-0.5 rounded-full">여자부 · BADMINTON SINGLE ELIMINATION</span>
                     <h2 id="print-title-f" class="text-xl font-extrabold text-slate-900 mt-1"></h2>
@@ -255,7 +253,7 @@
                     </button>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-200" class="... print-area-page" id="league-print-area-m">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-200" id="league-print-area-m">
                 <div class="text-center border-b border-slate-300 pb-3 mb-4">
                     <span class="text-[9px] font-bold text-blue-600 tracking-widest border border-blue-200 bg-blue-50 px-2 py-0.5 rounded-full">남자부 · BADMINTON ROUND ROBIN</span>
                     <h2 id="league-title-m" class="text-xl font-extrabold text-slate-900 mt-1"></h2>
@@ -266,7 +264,7 @@
                 <div id="league-rounds-m" class="w-full"></div>
                 <div class="mt-4 pt-2 border-t border-slate-200 text-center text-[9px] text-slate-400">단판 리그전 · 라운드별 동시 진행 · A4 세로 출력</div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-pink-200"  class="... print-area-page" id="league-print-area-f">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-pink-200" id="league-print-area-f">
                 <div class="text-center border-b border-slate-300 pb-3 mb-4">
                     <span class="text-[9px] font-bold text-pink-600 tracking-widest border border-pink-200 bg-pink-50 px-2 py-0.5 rounded-full">여자부 · BADMINTON ROUND ROBIN</span>
                     <h2 id="league-title-f" class="text-xl font-extrabold text-slate-900 mt-1"></h2>
@@ -404,7 +402,7 @@
                 </div>
 
                 <!-- 남자부 복식 -->
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-200" class="... print-area-page" id="doubles-print-area-m">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-200" id="doubles-print-area-m">
                     <div class="text-center border-b border-slate-300 pb-3 mb-4">
                         <span class="text-[9px] font-bold text-blue-600 tracking-widest border border-blue-200 bg-blue-50 px-2 py-0.5 rounded-full" id="doubles-badge-m">남자부 · BADMINTON DOUBLES</span>
                         <h2 id="doubles-title-m" class="text-xl font-extrabold text-slate-900 mt-1"></h2>
@@ -417,7 +415,7 @@
                 </div>
 
                 <!-- 여자부 복식 -->
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-pink-200" class="... print-area-page" id="doubles-print-area-f">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-pink-200" id="doubles-print-area-f">
                     <div class="text-center border-b border-slate-300 pb-3 mb-4">
                         <span class="text-[9px] font-bold text-pink-600 tracking-widest border border-pink-200 bg-pink-50 px-2 py-0.5 rounded-full" id="doubles-badge-f">여자부 · BADMINTON DOUBLES</span>
                         <h2 id="doubles-title-f" class="text-xl font-extrabold text-slate-900 mt-1"></h2>
@@ -443,6 +441,17 @@
         <h4 class="text-base font-bold text-slate-950 mb-1" id="toast-title">오류</h4>
         <p class="text-sm text-slate-600 mb-4" id="toast-message"></p>
         <button onclick="closeToast()" class="w-full bg-slate-900 text-white font-semibold py-2 rounded-xl text-xs">확인</button>
+    </div>
+</div>
+
+<!-- Print Loading -->
+<div id="print-loading" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center z-[9999] no-print">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center gap-4 text-center">
+        <div class="w-12 h-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin"></div>
+        <div>
+            <h4 class="text-base font-bold text-slate-900">인쇄 준비 중</h4>
+            <p class="text-xs text-slate-500 mt-1" id="print-loading-msg">캡처 중...</p>
+        </div>
     </div>
 </div>
 
@@ -2472,26 +2481,48 @@ function printDoubles() {
 }
 
 /* ════════ 인쇄 ════════ */
-function printBoth(mode) {
-    if (mode === 'tournament') { drawBracketLines('m'); drawBracketLines('f'); }
-    // 이전 print 클래스 제거 후 새 클래스 추가
-    document.body.classList.remove('print-tournament', 'print-league', 'print-doubles');
-    document.body.classList.add(`print-${mode}`);
-    window.print();
-    setTimeout(() => {
-        document.body.classList.remove('print-tournament', 'print-league', 'print-doubles');
-    }, 1500);
+async function printBoth(mode) {
+    const isLandscape = mode === 'tournament';
+    const areaIds = isLandscape
+        ? ['bracket-print-area-m','bracket-print-area-f']
+        : ['league-print-area-m','league-print-area-f'];
+    const labels = isLandscape
+        ? ['남자부 토너먼트 캡처 중…','여자부 토너먼트 캡처 중…']
+        : ['남자부 리그전 캡처 중…','여자부 리그전 캡처 중…'];
+    await printBothAreas(areaIds[0], areaIds[1], isLandscape, labels);
 }
 
-function printBothAreas(areaId1, areaId2, isLandscape) {
-    const mode = areaId1.includes('doubles') ? 'doubles'
-        : areaId1.includes('bracket') ? 'tournament' : 'league';
-    printBoth(mode);
+async function printBothAreas(areaId1, areaId2, isLandscape, labels) {
+    if (!labels) labels = ['남자부 캡처 중…','여자부 캡처 중…'];
+    const loader = document.getElementById('print-loading');
+    const msg    = document.getElementById('print-loading-msg');
+    loader.classList.remove('hidden'); loader.classList.add('flex');
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+    document.querySelectorAll('.print-page').forEach(p => {
+        p.classList.toggle('page-landscape', isLandscape);
+        p.classList.toggle('page-portrait',  !isLandscape);
+    });
+
+    if (isLandscape) { drawBracketLines('m'); drawBracketLines('f'); }
+
+    try {
+        for (let i=0;i<2;i++) {
+            msg.innerText = (i===0?labels[0]:labels[1]);
+            const areaId = i===0 ? areaId1 : areaId2;
+            const canvas = await html2canvas(document.getElementById(areaId),{
+                scale:2, useCORS:true, backgroundColor:'#ffffff', logging:false
+            });
+            document.getElementById(`print-img-${i+1}`).src = canvas.toDataURL('image/png');
+        }
+        loader.classList.add('hidden'); loader.classList.remove('flex');
+        window.print();
+    } catch(e) {
+        console.error(e);
+        loader.classList.add('hidden'); loader.classList.remove('flex');
+        showToast("인쇄 실패","캡처 중 오류가 발생했습니다.");
+    }
 }
-function printDoubles() {
-    printBoth('doubles');
-}
-⑤ print-area-page 클래스 추가 (6곳)
 
 /* ── 유틸 ── */
 function shuffle(arr) {

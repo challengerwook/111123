@@ -93,7 +93,7 @@
             <div class="flex items-center space-x-3">
                 <div class="p-2 bg-white/10 rounded-xl"><i data-lucide="sparkles" class="w-7 h-7 text-yellow-300"></i></div>
                 <div>
-                    <h1 class="text-xl font-extrabold tracking-tight">배드민턴 대진표 생성기</h1>
+                    <h1 class="text-xl font-extrabold tracking-tight"> 대진표 생성기</h1>
                     <p class="text-xs text-indigo-100 mt-0.5">1~3학년 전체 명렬표 내장 · 토너먼트 / 리그전 / 복식 조편성</p>
                 </div>
             </div>
@@ -1766,7 +1766,7 @@ function buildSingleTournament(participants, sx) {
     const bye = bs - count;
     const dist = distributePlayersAndByes(sh, bs, bye);
     const gl = sx==='m' ? '남자부' : '여자부';
-    document.getElementById(`print-title-${sx}`).innerText = `${currentGrade}학년 ${currentClass}반 배드민턴 ${bs}강 대진표 (${gl})`;
+    document.getElementById(`print-title-${sx}`).innerText = `${currentGrade}학년 ${currentClass}반  ${bs}강 대진표 (${gl})`;
     document.getElementById(`print-participants-${sx}`).innerText = `출전 인원: ${count}명 (부전승: ${bye}명)`;
     renderSymmetricBracket(dist, bs, sx);
     drawBracketLines(sx);
@@ -1971,7 +1971,7 @@ function renderLeagueB(rounds, playerCount, sx) {
     const gl = sx==='m' ? '남자부' : '여자부';
     const totalMatches = rounds.reduce((s,r)=>s+r.matches.length,0);
     document.getElementById(`league-title-${sx}`).innerText =
-        `${currentGrade}학년 ${currentClass}반 배드민턴 리그전 대진표 (${gl})`;
+        `${currentGrade}학년 ${currentClass}반  리그전 대진표 (${gl})`;
     document.getElementById(`league-participants-${sx}`).innerText =
         `출전 인원: ${playerCount}명 · 총 ${rounds.length}라운드 · ${totalMatches}경기`;
 
@@ -2263,7 +2263,7 @@ function buildDoublesBracket() {
     if (teamsF.length < 2) { showToast("여자부 팀 부족","출전 팀이 2팀 미만입니다."); return; }
 
     const modeName = currentDoubleMode === 'league' ? '리그전' : '토너먼트';
-    const gl = `${currentGrade}학년 ${currentClass}반 배드민턴 복식 ${modeName}`;
+    const gl = `${currentGrade}학년 ${currentClass}반  복식 ${modeName}`;
 
     ['m','f'].forEach(sx => {
         const teams = sx === 'm' ? teamsM : teamsF;

@@ -11,28 +11,38 @@
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
         body { font-family: 'Pretendard', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .prevent-clip { line-height: 1.35 !important; overflow: visible !important; white-space: nowrap; }
-        .tab-active { background:#4f46e5; color:#fff; border-color:#4f46e5; }
+        .tab-active   { background:#4f46e5; color:#fff; border-color:#4f46e5; }
         .tab-inactive { background:#fff; color:#475569; border-color:#e2e8f0; }
+
+        /* ── 인쇄 ── */
         @media print {
-            @page { size: A4 landscape; margin: 0; }
-            body { margin: 0; padding: 0; background: white; }
-            .no-print { display: none !important; }
+            /* 토너먼트: 가로, 리그전: 세로 — JS가 class로 제어 */
+            @page { margin: 0; }
+            body  { margin:0; padding:0; background:white; }
+            .no-print { display:none !important; }
             .print-page {
-                display: block !important;
-                width: 100vw; height: 100vh;
-                page-break-after: always;
-                page-break-inside: avoid;
+                display:block !important;
+                width:100vw; height:100vh;
+                page-break-after:always;
+                page-break-inside:avoid;
             }
-            .print-page:last-child { page-break-after: auto; }
-            #print-pages-container { display: block !important; }
-            #app-container { display: none !important; }
+            .print-page:last-child { page-break-after:auto; }
+            #print-pages-container { display:block !important; }
+            #app-container { display:none !important; }
         }
-        #print-pages-container { display: none; }
+        /* 토너먼트용 가로 페이지 */
+        .page-landscape { page: landscape-page; }
+        @page landscape-page { size: A4 landscape; margin:0; }
+        /* 리그전용 세로 페이지 */
+        .page-portrait  { page: portrait-page; }
+        @page portrait-page  { size: A4 portrait;  margin:0; }
+
+        #print-pages-container { display:none; }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
 
-<!-- 인쇄 전용 컨테이너 -->
+<!-- 인쇄 전용 -->
 <div id="print-pages-container">
     <div class="print-page" id="print-page-1">
         <img id="print-img-1" src="" style="width:100%;height:100%;object-fit:contain;display:block;" />
@@ -46,14 +56,12 @@
 
     <!-- Header -->
     <header class="bg-gradient-to-r from-indigo-700 to-purple-700 text-white shadow-md no-print">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
-                <div class="p-2 bg-white/10 rounded-xl">
-                    <i data-lucide="sparkles" class="w-7 h-7 text-yellow-300"></i>
-                </div>
+                <div class="p-2 bg-white/10 rounded-xl"><i data-lucide="sparkles" class="w-7 h-7 text-yellow-300"></i></div>
                 <div>
                     <h1 class="text-xl font-extrabold tracking-tight">배드민턴 대진표 발전기</h1>
-                    <p class="text-xs text-indigo-100 mt-0.5">1~3학년 전체 명렬표 내장 • 토너먼트 / 리그전 • 남녀 동시 생성</p>
+                    <p class="text-xs text-indigo-100 mt-0.5">1~3학년 전체 명렬표 내장 · 토너먼트 / 리그전 · 남녀 동시 생성</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2 text-xs bg-black/20 px-3.5 py-1.5 rounded-full border border-white/10">
@@ -63,24 +71,23 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-4 md:py-6 flex-1 w-full flex flex-col">
+    <main class="max-w-5xl mx-auto px-4 py-4 md:py-6 flex-1 w-full flex flex-col">
 
-        <!-- 탭 선택 -->
+        <!-- 탭 -->
         <div class="flex gap-2 mb-5 no-print">
             <button id="tab-btn-tournament" onclick="switchTab('tournament')"
                 class="tab-active flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 text-sm font-bold transition-all">
-                <i data-lucide="git-branch" class="w-4 h-4"></i> 토너먼트 (단판 토너먼트)
+                <i data-lucide="git-branch" class="w-4 h-4"></i> 토너먼트
             </button>
             <button id="tab-btn-league" onclick="switchTab('league')"
                 class="tab-inactive flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 text-sm font-bold transition-all">
-                <i data-lucide="list-ordered" class="w-4 h-4"></i> 리그전 (단판 리그전)
+                <i data-lucide="list-ordered" class="w-4 h-4"></i> 리그전
             </button>
         </div>
 
-        <!-- ========== 공통: 학년/반/결석 설정 패널 ========== -->
+        <!-- 공통 설정 패널 -->
         <section class="mb-6 no-print">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-5">
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <!-- 학년 -->
                     <div>
@@ -98,23 +105,26 @@
                         <label class="block text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                             <i data-lucide="graduation-cap" class="w-4 h-4 text-indigo-500"></i> 반 선택
                         </label>
-                        <select id="class-select" onchange="changeClass(this.value)" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 p-2.5 font-bold"></select>
+                        <select id="class-select" onchange="changeClass(this.value)"
+                            class="w-full bg-slate-50 border-2 border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 p-2.5 font-bold"></select>
                     </div>
                     <!-- 생성 버튼 -->
                     <div class="flex items-end">
-                        <button id="generate-btn" onclick="onGenerate()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
+                        <button id="generate-btn" onclick="onGenerate()"
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
                             <i data-lucide="git-branch" class="w-4 h-4" id="generate-btn-icon"></i>
-                            <span id="generate-btn-label">남녀 대진표 동시 생성</span>
+                            <span id="generate-btn-label">남녀 토너먼트 대진표 생성</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- 결석 체크 (남녀 나란히) -->
+                <!-- 결석 체크 -->
                 <div class="border-t border-slate-100 pt-4">
                     <div class="flex items-center justify-between mb-3">
                         <label class="block text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                             <i data-lucide="user-minus" class="w-4 h-4 text-red-500"></i>
-                            오늘 결석생 체크 (<span class="text-red-500 font-bold ml-1">체크된 학생은 대진에서 제외</span>)
+                            오늘 결석생 체크
+                            <span class="text-red-500 font-bold ml-1">(체크된 학생은 대진에서 제외)</span>
                         </label>
                         <button onclick="clearAllAbsentees()" class="text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-bold flex items-center gap-1">
                             <i data-lucide="refresh-cw" class="w-3 h-3"></i> 전체 초기화
@@ -137,11 +147,10 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </section>
 
-        <!-- ========== 토너먼트 출력 섹션 ========== -->
+        <!-- ══ 토너먼트 출력 ══ -->
         <section id="output-tournament" class="hidden flex-1 flex flex-col gap-6">
             <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 no-print shadow-sm">
                 <div class="flex items-center space-x-3">
@@ -155,12 +164,11 @@
                     <button onclick="onGenerate()" class="flex-1 sm:flex-none bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5">
                         <i data-lucide="shuffle" class="w-3.5 h-3.5"></i><span>다시 섞기</span>
                     </button>
-                    <button onclick="printBothBrackets('tournament')" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5">
-                        <i data-lucide="printer" class="w-3.5 h-3.5"></i><span>남녀 2페이지 인쇄</span>
+                    <button onclick="printBoth('tournament')" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i><span>남녀 2페이지 가로 인쇄</span>
                     </button>
                 </div>
             </div>
-
             <!-- 남자부 토너먼트 -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-blue-200 flex flex-col" id="bracket-print-area-m">
                 <div class="text-center border-b border-slate-300 pb-3 mb-4">
@@ -176,7 +184,6 @@
                 </div>
                 <div class="mt-4 pt-2 border-t border-slate-200 text-center text-[9px] text-slate-400">싱글 엘리미네이션 양방향 대치 구조 · A4 가로 출력</div>
             </div>
-
             <!-- 여자부 토너먼트 -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-pink-200 flex flex-col" id="bracket-print-area-f">
                 <div class="text-center border-b border-slate-300 pb-3 mb-4">
@@ -194,7 +201,7 @@
             </div>
         </section>
 
-        <!-- ========== 리그전 출력 섹션 ========== -->
+        <!-- ══ 리그전 출력 ══ -->
         <section id="output-league" class="hidden flex-1 flex flex-col gap-6">
             <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 no-print shadow-sm">
                 <div class="flex items-center space-x-3">
@@ -208,12 +215,11 @@
                     <button onclick="onGenerate()" class="flex-1 sm:flex-none bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5">
                         <i data-lucide="shuffle" class="w-3.5 h-3.5"></i><span>다시 섞기</span>
                     </button>
-                    <button onclick="printBothBrackets('league')" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5">
-                        <i data-lucide="printer" class="w-3.5 h-3.5"></i><span>남녀 2페이지 인쇄</span>
+                    <button onclick="printBoth('league')" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i><span>남녀 2페이지 세로 인쇄</span>
                     </button>
                 </div>
             </div>
-
             <!-- 남자부 리그 -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-blue-200" id="league-print-area-m">
                 <div class="text-center border-b border-slate-300 pb-3 mb-5">
@@ -223,10 +229,9 @@
                         <span id="league-date-m"></span><span>•</span><span id="league-participants-m"></span>
                     </div>
                 </div>
-                <div id="league-matches-m" class="w-full"></div>
-                <div class="mt-5 pt-2 border-t border-slate-200 text-center text-[9px] text-slate-400">단판 리그전 · 모든 선수가 1회씩 대결 · A4 가로 출력</div>
+                <div id="league-rounds-m" class="w-full"></div>
+                <div class="mt-5 pt-2 border-t border-slate-200 text-center text-[9px] text-slate-400">단판 리그전 · 라운드별 동시 진행 · A4 세로 출력</div>
             </div>
-
             <!-- 여자부 리그 -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-pink-200" id="league-print-area-f">
                 <div class="text-center border-b border-slate-300 pb-3 mb-5">
@@ -236,8 +241,8 @@
                         <span id="league-date-f"></span><span>•</span><span id="league-participants-f"></span>
                     </div>
                 </div>
-                <div id="league-matches-f" class="w-full"></div>
-                <div class="mt-5 pt-2 border-t border-slate-200 text-center text-[9px] text-slate-400">단판 리그전 · 모든 선수가 1회씩 대결 · A4 가로 출력</div>
+                <div id="league-rounds-f" class="w-full"></div>
+                <div class="mt-5 pt-2 border-t border-slate-200 text-center text-[9px] text-slate-400">단판 리그전 · 라운드별 동시 진행 · A4 세로 출력</div>
             </div>
         </section>
 
@@ -1413,64 +1418,53 @@ const studentDatabase = [
     { grade: "3", classNo: "12", num: "28", name: "홍승민", gender: "남" }
 ];
 
-    const maxClassByGrade = { "1": 13, "2": 13, "3": 12 };
+    const maxClassByGrade = { "1":13, "2":13, "3":12 };
     let currentGrade = "1";
     let currentClass = "1";
-    let currentTab = "tournament"; // "tournament" | "league"
+    let currentTab   = "tournament";
 
     window.onload = function() {
         const today = new Date();
-        const dateStr = `${today.getFullYear()}년 ${String(today.getMonth()+1).padStart(2,'0')}월 ${String(today.getDate()).padStart(2,'0')}일`;
+        const ds = `${today.getFullYear()}년 ${String(today.getMonth()+1).padStart(2,'0')}월 ${String(today.getDate()).padStart(2,'0')}일`;
         ['print-date-m','print-date-f','league-date-m','league-date-f'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.innerText = `작성일: ${dateStr}`;
+            if (el) el.innerText = `작성일: ${ds}`;
         });
         lucide.createIcons();
         updateClassDropdown();
         renderAbsentees();
         window.addEventListener('resize', () => {
             if (!document.getElementById('output-tournament').classList.contains('hidden')) {
-                drawBracketLines('m');
-                drawBracketLines('f');
+                drawBracketLines('m'); drawBracketLines('f');
             }
         });
     };
 
-    /* ── 탭 전환 ── */
+    /* ── 탭 ── */
     function switchTab(tab) {
         currentTab = tab;
-        document.getElementById('tab-btn-tournament').className =
-            (tab === 'tournament' ? 'tab-active' : 'tab-inactive') +
-            ' flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 text-sm font-bold transition-all';
-        document.getElementById('tab-btn-league').className =
-            (tab === 'league' ? 'tab-active' : 'tab-inactive') +
-            ' flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 text-sm font-bold transition-all';
-
-        const icon = document.getElementById('generate-btn-icon');
-        const label = document.getElementById('generate-btn-label');
-        if (tab === 'tournament') {
-            icon.setAttribute('data-lucide','git-branch');
-            label.innerText = '남녀 토너먼트 대진표 생성';
-        } else {
-            icon.setAttribute('data-lucide','list-ordered');
-            label.innerText = '남녀 리그전 대진표 생성';
-        }
+        ['tournament','league'].forEach(t => {
+            document.getElementById(`tab-btn-${t}`).className =
+                (t===tab ? 'tab-active' : 'tab-inactive') +
+                ' flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 text-sm font-bold transition-all';
+        });
+        const isTour = tab === 'tournament';
+        document.getElementById('generate-btn-icon').setAttribute('data-lucide', isTour ? 'git-branch' : 'list-ordered');
+        document.getElementById('generate-btn-label').innerText = isTour ? '남녀 토너먼트 대진표 생성' : '남녀 리그전 대진표 생성';
         lucide.createIcons();
-
         document.getElementById('output-tournament').classList.add('hidden');
         document.getElementById('output-league').classList.add('hidden');
     }
-
     function onGenerate() {
         if (currentTab === 'tournament') buildBothTournaments();
         else buildBothLeagues();
     }
 
-    /* ── 학년/반 ── */
+    /* ── 학년 / 반 ── */
     function selectGrade(grade) {
         currentGrade = grade; currentClass = "1";
         [1,2,3].forEach(g => {
-            document.getElementById(`grade-btn-${g}`).className = String(g) === grade
+            document.getElementById(`grade-btn-${g}`).className = String(g)===grade
                 ? "py-2.5 px-2 rounded-xl border-2 text-sm font-bold transition-all text-center focus:outline-none bg-indigo-50 border-indigo-600 text-indigo-700"
                 : "py-2.5 px-2 rounded-xl border-2 text-sm font-bold transition-all text-center focus:outline-none bg-white border-slate-200 text-slate-600 hover:border-slate-300";
         });
@@ -1479,10 +1473,10 @@ const studentDatabase = [
     function updateClassDropdown() {
         const sel = document.getElementById('class-select');
         sel.innerHTML = "";
-        for (let i = 1; i <= maxClassByGrade[currentGrade]; i++) {
+        for (let i=1; i<=maxClassByGrade[currentGrade]; i++) {
             const opt = document.createElement('option');
             opt.value = String(i); opt.innerText = `${i}반`;
-            if (String(i) === currentClass) opt.selected = true;
+            if (String(i)===currentClass) opt.selected = true;
             sel.appendChild(opt);
         }
     }
@@ -1490,34 +1484,34 @@ const studentDatabase = [
 
     /* ── 결석 ── */
     function renderAbsentees() {
-        renderGenderAbsentees('남','absentee-m','male-count-badge');
-        renderGenderAbsentees('여','absentee-f','female-count-badge');
+        renderGender('남','absentee-m','male-count-badge');
+        renderGender('여','absentee-f','female-count-badge');
     }
-    function renderGenderAbsentees(gender, containerId, badgeId) {
+    function renderGender(gender, cid, bid) {
         const filtered = studentDatabase.filter(s => s.grade===currentGrade && s.classNo===currentClass && s.gender===gender);
-        const container = document.getElementById(containerId);
+        const container = document.getElementById(cid);
         container.innerHTML = "";
-        const badge = document.getElementById(badgeId);
-        if (filtered.length === 0) {
-            container.innerHTML = `<p class="text-slate-400 text-center py-4 text-xs">해당 학생 없음</p>`;
+        const badge = document.getElementById(bid);
+        if (!filtered.length) {
+            container.innerHTML = '<p class="text-slate-400 text-center py-4 text-xs">해당 학생 없음</p>';
             if (badge) badge.innerText = ""; return;
         }
         if (badge) badge.innerText = `총 ${filtered.length}명`;
         const grid = document.createElement('div');
         grid.className = "grid grid-cols-2 sm:grid-cols-3 gap-2";
-        filtered.sort((a,b)=>parseInt(a.num)-parseInt(b.num)).forEach(student => {
+        filtered.sort((a,b)=>parseInt(a.num)-parseInt(b.num)).forEach(s => {
             const label = document.createElement('label');
             label.className = "flex items-center space-x-2 p-2 bg-white rounded-xl border border-slate-200 hover:border-indigo-300 cursor-pointer transition-all select-none text-xs font-semibold shadow-sm";
             const cb = document.createElement('input');
             cb.type = "checkbox";
-            cb.value = `${student.grade}-${student.classNo}-${student.num}-${student.name}`;
-            cb.className = "w-3.5 h-3.5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer flex-shrink-0";
+            cb.value = `${s.grade}-${s.classNo}-${s.num}-${s.name}`;
+            cb.className = "w-3.5 h-3.5 text-indigo-600 border-slate-300 rounded flex-shrink-0";
             cb.addEventListener('change', () => {
                 if (cb.checked) label.classList.add('border-red-400','bg-red-50/50','text-red-700');
                 else label.classList.remove('border-red-400','bg-red-50/50','text-red-700');
             });
             const span = document.createElement('span');
-            span.innerText = `${student.num}번 ${student.name}`;
+            span.innerText = `${s.num}번 ${s.name}`;
             label.appendChild(cb); label.appendChild(span); grid.appendChild(label);
         });
         container.appendChild(grid);
@@ -1530,20 +1524,15 @@ const studentDatabase = [
             });
         });
     }
-    function getAbsentList(containerId) {
-        return Array.from(document.getElementById(containerId).querySelectorAll('input[type="checkbox"]:checked')).map(cb=>cb.value);
-    }
-    function getParticipants(gender, absentContainerId) {
-        const absent = getAbsentList(absentContainerId);
+    function getParticipants(gender, cid) {
+        const absent = Array.from(document.getElementById(cid).querySelectorAll('input:checked')).map(cb=>cb.value);
         return studentDatabase.filter(s =>
             s.grade===currentGrade && s.classNo===currentClass && s.gender===gender &&
             !absent.includes(`${s.grade}-${s.classNo}-${s.num}-${s.name}`)
         );
     }
 
-    /* ════════════════════════════
-       토너먼트
-    ════════════════════════════ */
+    /* ════════ 토너먼트 ════════ */
     function buildBothTournaments() {
         const mP = getParticipants('남','absentee-m');
         const fP = getParticipants('여','absentee-f');
@@ -1557,287 +1546,320 @@ const studentDatabase = [
         document.getElementById('output-league').classList.add('hidden');
         document.getElementById('output-tournament').scrollIntoView({behavior:'smooth'});
     }
-
-    function buildSingleTournament(participants, suffix) {
-        const shuffled = [...participants];
-        for (let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
-        const count=shuffled.length;
-        let bracketSize=2; while(bracketSize<count) bracketSize*=2;
-        const byeCount=bracketSize-count;
-        const distributed=distributePlayersAndByes(shuffled,bracketSize,byeCount);
-        const gl=suffix==='m'?'남자부':'여자부';
-        document.getElementById(`print-title-${suffix}`).innerText=`${currentGrade}학년 ${currentClass}반 배드민턴 ${bracketSize}강 대진표 (${gl})`;
-        document.getElementById(`print-participants-${suffix}`).innerText=`출전 인원: ${count}명 (부전승: ${byeCount}명)`;
-        renderSymmetricBracket(distributed,bracketSize,suffix);
-        drawBracketLines(suffix);
+    function buildSingleTournament(participants, sx) {
+        const sh = shuffle([...participants]);
+        const count = sh.length;
+        let bs = 2; while (bs < count) bs *= 2;
+        const bye = bs - count;
+        const dist = distributePlayersAndByes(sh, bs, bye);
+        const gl = sx==='m' ? '남자부' : '여자부';
+        document.getElementById(`print-title-${sx}`).innerText = `${currentGrade}학년 ${currentClass}반 배드민턴 ${bs}강 대진표 (${gl})`;
+        document.getElementById(`print-participants-${sx}`).innerText = `출전 인원: ${count}명 (부전승: ${bye}명)`;
+        renderSymmetricBracket(dist, bs, sx);
+        drawBracketLines(sx);
     }
-    function distributePlayersAndByes(players,size,byeCount){
-        const matchCount=size/2,tempSlots=new Array(size).fill(null),matchesHaveBye=new Array(matchCount).fill(false);
-        if(byeCount>0){const step=matchCount/byeCount;for(let i=0;i<byeCount;i++)matchesHaveBye[Math.floor(i*step)]=true;}
+    function distributePlayersAndByes(players, size, byeCount) {
+        const mc = size/2, slots = new Array(size).fill(null), hasBye = new Array(mc).fill(false);
+        if (byeCount>0) { const step=mc/byeCount; for(let i=0;i<byeCount;i++) hasBye[Math.floor(i*step)]=true; }
         let pi=0;
-        for(let m=0;m<matchCount;m++){
-            if(matchesHaveBye[m]){tempSlots[m*2]=players[pi++];tempSlots[m*2+1]={name:"부전승",isBye:true};}
-            else{tempSlots[m*2]=players[pi++];tempSlots[m*2+1]=players[pi++];}
+        for (let m=0;m<mc;m++) {
+            if (hasBye[m]) { slots[m*2]=players[pi++]; slots[m*2+1]={name:"부전승",isBye:true}; }
+            else { slots[m*2]=players[pi++]; slots[m*2+1]=players[pi++]; }
         }
-        return tempSlots;
+        return slots;
     }
-    function renderSymmetricBracket(slots,size,suffix){
-        const container=document.getElementById(`bracket-columns-container-${suffix}`);
-        const svg=document.getElementById(`bracket-svg-lines-${suffix}`);
-        container.innerHTML="";svg.innerHTML="";
-        const totalRounds=Math.log2(size),halfSize=size/2;
-        const leftRoster=slots.slice(0,halfSize),rightRoster=slots.slice(halfSize);
-        const leftTree=generateSideRounds(leftRoster,totalRounds-1);
-        const rightTree=generateSideRounds(rightRoster,totalRounds-1);
-        const sideRoundsCount=totalRounds-1;
-        for(let r=0;r<sideRoundsCount;r++) container.appendChild(createColumnNode("left",r,leftTree[r],size,suffix));
-        const centerCol=document.createElement('div');
-        centerCol.className="flex-[1.2] flex flex-col justify-center items-center gap-4 relative px-2";
+    function renderSymmetricBracket(slots, size, sx) {
+        const con = document.getElementById(`bracket-columns-container-${sx}`);
+        const svg = document.getElementById(`bracket-svg-lines-${sx}`);
+        con.innerHTML=""; svg.innerHTML="";
+        const tr=Math.log2(size), half=size/2;
+        const lT=generateSideRounds(slots.slice(0,half),tr-1);
+        const rT=generateSideRounds(slots.slice(half),tr-1);
+        const sc=tr-1;
+        for(let r=0;r<sc;r++) con.appendChild(createColNode("left",r,lT[r],size,sx));
+        const cc=document.createElement('div');
+        cc.className="flex-[1.2] flex flex-col justify-center items-center gap-4 relative px-2";
         const cl=document.createElement('div');
         cl.className="absolute top-0 text-center font-extrabold text-[10px] text-slate-400 tracking-wider uppercase";
-        cl.innerText="결승전"; centerCol.appendChild(cl);
-        centerCol.appendChild(createFinalistCard("left",leftTree[sideRoundsCount]?.[0]??null,suffix));
+        cl.innerText="결승전"; cc.appendChild(cl);
+        cc.appendChild(createFinalistCard("left",lT[sc]?.[0]??null,sx));
         const vs=document.createElement('div');
-        vs.id=`center-vs-badge-${suffix}`;
+        vs.id=`center-vs-badge-${sx}`;
         vs.className="w-10 h-10 rounded-full bg-slate-900 border-2 border-slate-700 flex items-center justify-center text-xs font-black text-white shadow-md z-10 my-2";
-        vs.innerText="VS"; centerCol.appendChild(vs);
-        centerCol.appendChild(createFinalistCard("right",rightTree[sideRoundsCount]?.[0]??null,suffix));
-        container.appendChild(centerCol);
-        for(let r=sideRoundsCount-1;r>=0;r--) container.appendChild(createColumnNode("right",r,rightTree[r],size,suffix));
+        vs.innerText="VS"; cc.appendChild(vs);
+        cc.appendChild(createFinalistCard("right",rT[sc]?.[0]??null,sx));
+        con.appendChild(cc);
+        for(let r=sc-1;r>=0;r--) con.appendChild(createColNode("right",r,rT[r],size,sx));
         lucide.createIcons();
     }
-    function generateSideRounds(initialRoster,sideRoundsCount){
-        const rounds=[initialRoster];let current=[...initialRoster];
-        for(let r=0;r<sideRoundsCount;r++){
-            const next=[];
-            for(let i=0;i<current.length/2;i++){
-                const p1=current[i*2],p2=current[i*2+1];
-                if(p1?.isBye&&!p2?.isBye) next.push(p2);
-                else if(p2?.isBye&&!p1?.isBye) next.push(p1);
-                else next.push(null);
+    function generateSideRounds(roster, rounds) {
+        const res=[roster]; let cur=[...roster];
+        for(let r=0;r<rounds;r++){
+            const nxt=[];
+            for(let i=0;i<cur.length/2;i++){
+                const p1=cur[i*2],p2=cur[i*2+1];
+                if(p1?.isBye&&!p2?.isBye) nxt.push(p2);
+                else if(p2?.isBye&&!p1?.isBye) nxt.push(p1);
+                else nxt.push(null);
             }
-            rounds.push(next);current=next;
+            res.push(nxt); cur=nxt;
         }
-        return rounds;
+        return res;
     }
-    function createColumnNode(side,roundIndex,roundData,maxBracketSize,suffix){
+    function createColNode(side, ri, data, maxSize, sx) {
         const col=document.createElement('div');
         col.className="flex-1 flex flex-col justify-around relative px-1 py-1";
-        const header=document.createElement('div');
-        header.className="text-center font-extrabold text-[9px] tracking-wider text-slate-400 uppercase mb-2 no-print";
-        header.innerText=`${maxBracketSize/Math.pow(2,roundIndex)}강`;
-        col.appendChild(header);
-        roundData.forEach((item,i)=>{
-            const slotC=document.createElement('div');
-            slotC.className=`${maxBracketSize>=32?'my-0.5':'my-1'} flex flex-col justify-center items-center relative w-full h-[32px]`;
+        const hd=document.createElement('div');
+        hd.className="text-center font-extrabold text-[9px] tracking-wider text-slate-400 uppercase mb-2 no-print";
+        hd.innerText=`${maxSize/Math.pow(2,ri)}강`; col.appendChild(hd);
+        data.forEach((item,i)=>{
+            const sc=document.createElement('div');
+            sc.className=`${maxSize>=32?'my-0.5':'my-1'} flex flex-col justify-center items-center relative w-full h-[32px]`;
             const card=document.createElement('div');
-            card.id=`card-${suffix}-${side}-${roundIndex}-${i}`;
-            card.setAttribute('data-side',side);card.setAttribute('data-round',roundIndex);
-            card.setAttribute('data-index',i);card.setAttribute('data-suffix',suffix);
+            card.id=`card-${sx}-${side}-${ri}-${i}`;
+            card.setAttribute('data-side',side); card.setAttribute('data-round',ri);
+            card.setAttribute('data-index',i);
             if(item?.isBye){
-                card.className="w-full text-center bg-slate-50 text-slate-400 border border-slate-300 rounded p-1 text-[9px] font-bold shadow-sm flex items-center justify-center gap-1 prevent-clip h-[28px]";
-                card.innerHTML=`<i data-lucide="sparkles" class="w-2.5 h-2.5 text-slate-400"></i>부전승`;
+                card.className="w-full text-center bg-slate-50 text-slate-400 border border-slate-300 rounded p-1 text-[9px] font-bold flex items-center justify-center gap-1 prevent-clip h-[28px]";
+                card.innerHTML=`<i data-lucide="sparkles" class="w-2.5 h-2.5"></i>부전승`;
             } else if(item){
                 card.className="w-full bg-white text-slate-800 border-2 border-slate-700 rounded p-1 text-[9px] shadow-sm flex items-center font-extrabold prevent-clip h-[28px]";
-                const nb=item.num?`<span class="bg-indigo-100 text-indigo-800 rounded px-1 text-[8px] mr-1 inline-flex items-center justify-center h-[14px] leading-none flex-shrink-0">${item.num}</span>`:'';
-                card.innerHTML=`<div class="flex items-center truncate prevent-clip">${nb}<span class="truncate text-slate-900 prevent-clip">${item.name}</span></div>`;
+                const nb=item.num?`<span class="bg-indigo-100 text-indigo-800 rounded px-1 text-[8px] mr-1 inline-flex items-center h-[14px] leading-none flex-shrink-0">${item.num}</span>`:'';
+                card.innerHTML=`<div class="flex items-center truncate">${nb}<span class="truncate">${item.name}</span></div>`;
             } else {
                 card.className="w-full bg-slate-50 text-slate-300 border border-dashed border-slate-200 rounded p-1 text-[9px] text-center prevent-clip h-[28px] flex items-center justify-center";
                 card.innerText="대기생";
             }
-            slotC.appendChild(card);col.appendChild(slotC);
+            sc.appendChild(card); col.appendChild(sc);
         });
         return col;
     }
-    function createFinalistCard(side,item,suffix){
+    function createFinalistCard(side, item, sx) {
         const card=document.createElement('div');
-        card.id=`finalist-${suffix}-${side}`;
+        card.id=`finalist-${sx}-${side}`;
         if(item&&!item.isBye){
-            card.className="w-[120px] bg-gradient-to-r from-amber-50 to-orange-50 text-amber-950 border-2 border-amber-500 rounded-lg p-2 text-center shadow-md font-extrabold text-xs z-10 py-2.5 prevent-clip";
-            const nb=item.num?`<span class="text-amber-900 rounded px-1 text-[9px] mr-1 font-black">${item.num}번</span>`:'';
-            card.innerHTML=`<div class="text-[9px] text-amber-600 font-extrabold mb-1">결승진출</div><div class="truncate prevent-clip">${nb}${item.name}</div>`;
+            card.className="w-[120px] bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-500 rounded-lg p-2 text-center shadow-md font-extrabold text-xs z-10 py-2.5 prevent-clip";
+            const nb=item.num?`<span class="text-amber-900 text-[9px] mr-1 font-black">${item.num}번</span>`:'';
+            card.innerHTML=`<div class="text-[9px] text-amber-600 font-extrabold mb-1">결승진출</div><div class="truncate">${nb}${item.name}</div>`;
         } else {
-            card.className="w-[120px] bg-slate-50 text-slate-300 border border-dashed border-slate-300 rounded-lg p-2 text-center text-[10px] font-medium py-2.5 z-10 prevent-clip";
+            card.className="w-[120px] bg-slate-50 text-slate-300 border border-dashed border-slate-300 rounded-lg p-2 text-center text-[10px] font-medium py-2.5 z-10";
             card.innerText="결승 진출자 대기";
         }
         return card;
     }
-    function drawBracketLines(suffix){
-        const svg=document.getElementById(`bracket-svg-lines-${suffix}`);
+    function drawBracketLines(sx) {
+        const svg=document.getElementById(`bracket-svg-lines-${sx}`);
         svg.innerHTML="";
-        const outer=document.getElementById(`bracket-outer-frame-${suffix}`);
+        const outer=document.getElementById(`bracket-outer-frame-${sx}`);
         if(!outer) return;
-        const svgRect=outer.getBoundingClientRect();
-        Array.from(document.querySelectorAll(`[id^="card-${suffix}-"]`)).forEach(card=>{
+        const rect=outer.getBoundingClientRect();
+        document.querySelectorAll(`[id^="card-${sx}-"]`).forEach(card=>{
             const side=card.getAttribute('data-side');
             const round=parseInt(card.getAttribute('data-round'));
             const index=parseInt(card.getAttribute('data-index'));
             if(index%2!==0) return;
-            const mate=document.getElementById(`card-${suffix}-${side}-${round}-${index+1}`);
-            const target=document.getElementById(`card-${suffix}-${side}-${round+1}-${Math.floor(index/2)}`);
-            if(mate&&target){
-                const r1=card.getBoundingClientRect(),r2=mate.getBoundingClientRect(),rT=target.getBoundingClientRect();
-                const x1=side==="left"?r1.right-svgRect.left:r1.left-svgRect.left;
-                const y1=(r1.top+r1.bottom)/2-svgRect.top;
-                const x2=side==="left"?r2.right-svgRect.left:r2.left-svgRect.left;
-                const y2=(r2.top+r2.bottom)/2-svgRect.top;
-                const tx=side==="left"?rT.left-svgRect.left:rT.right-svgRect.left;
-                const ty=(rT.top+rT.bottom)/2-svgRect.top;
+            const mate=document.getElementById(`card-${sx}-${side}-${round}-${index+1}`);
+            const tgt=document.getElementById(`card-${sx}-${side}-${round+1}-${Math.floor(index/2)}`);
+            if(mate&&tgt){
+                const r1=card.getBoundingClientRect(),r2=mate.getBoundingClientRect(),rT=tgt.getBoundingClientRect();
+                const x1=side==="left"?r1.right-rect.left:r1.left-rect.left;
+                const y1=(r1.top+r1.bottom)/2-rect.top;
+                const x2=side==="left"?r2.right-rect.left:r2.left-rect.left;
+                const y2=(r2.top+r2.bottom)/2-rect.top;
+                const tx=side==="left"?rT.left-rect.left:rT.right-rect.left;
+                const ty=(rT.top+rT.bottom)/2-rect.top;
                 const mx=x1+(side==="left"?14:-14);
-                appendPath(`M ${x1} ${y1} H ${mx} V ${y2} H ${x2} M ${mx} ${ty} H ${tx}`,svg);
-            } else if(!target){
-                const finalist=document.getElementById(`finalist-${suffix}-${side}`);
-                if(finalist){
-                    const r1=card.getBoundingClientRect(),rF=finalist.getBoundingClientRect();
-                    const x1=side==="left"?r1.right-svgRect.left:r1.left-svgRect.left;
-                    const y1=(r1.top+r1.bottom)/2-svgRect.top;
-                    const tx=side==="left"?rF.left-svgRect.left:rF.right-svgRect.left;
-                    const ty=(rF.top+rF.bottom)/2-svgRect.top;
+                pPath(`M ${x1} ${y1} H ${mx} V ${y2} H ${x2} M ${mx} ${ty} H ${tx}`,svg);
+            } else if(!tgt){
+                const fin=document.getElementById(`finalist-${sx}-${side}`);
+                if(fin){
+                    const r1=card.getBoundingClientRect(),rF=fin.getBoundingClientRect();
+                    const x1=side==="left"?r1.right-rect.left:r1.left-rect.left;
+                    const y1=(r1.top+r1.bottom)/2-rect.top;
+                    const tx=side==="left"?rF.left-rect.left:rF.right-rect.left;
+                    const ty=(rF.top+rF.bottom)/2-rect.top;
                     const mx=x1+(side==="left"?14:-14);
-                    appendPath(`M ${x1} ${y1} H ${mx} V ${ty} H ${tx}`,svg);
+                    pPath(`M ${x1} ${y1} H ${mx} V ${ty} H ${tx}`,svg);
                 }
             }
         });
-        const vsBox=document.getElementById(`center-vs-badge-${suffix}`);
+        const vsBox=document.getElementById(`center-vs-badge-${sx}`);
         if(vsBox){
             const rVS=vsBox.getBoundingClientRect();
-            const vsY=(rVS.top+rVS.bottom)/2-svgRect.top;
+            const vsY=(rVS.top+rVS.bottom)/2-rect.top;
             ["left","right"].forEach(side=>{
-                const finalist=document.getElementById(`finalist-${suffix}-${side}`);
-                if(finalist){
-                    const rF=finalist.getBoundingClientRect();
-                    const fx=side==="left"?rF.right-svgRect.left:rF.left-svgRect.left;
-                    const fy=(rF.top+rF.bottom)/2-svgRect.top;
-                    const vsX=side==="left"?rVS.left-svgRect.left:rVS.right-svgRect.left;
+                const fin=document.getElementById(`finalist-${sx}-${side}`);
+                if(fin){
+                    const rF=fin.getBoundingClientRect();
+                    const fx=side==="left"?rF.right-rect.left:rF.left-rect.left;
+                    const fy=(rF.top+rF.bottom)/2-rect.top;
+                    const vsX=side==="left"?rVS.left-rect.left:rVS.right-rect.left;
                     const mx=fx+(side==="left"?12:-12);
-                    appendPath(`M ${fx} ${fy} H ${mx} V ${vsY} H ${vsX}`,svg,"#fbbf24",2.5);
+                    pPath(`M ${fx} ${fy} H ${mx} V ${vsY} H ${vsX}`,svg,"#fbbf24",2.5);
                 }
             });
         }
     }
-    function appendPath(d,svgEl,stroke="#64748b",width=2){
-        const path=document.createElementNS("http://www.w3.org/2000/svg","path");
-        path.setAttribute("d",d);path.setAttribute("fill","none");
-        path.setAttribute("stroke",stroke);path.setAttribute("stroke-width",width);
-        path.setAttribute("stroke-linecap","round");path.setAttribute("stroke-linejoin","round");
-        svgEl.appendChild(path);
+    function pPath(d,svg,stroke="#64748b",w=2){
+        const p=document.createElementNS("http://www.w3.org/2000/svg","path");
+        p.setAttribute("d",d); p.setAttribute("fill","none");
+        p.setAttribute("stroke",stroke); p.setAttribute("stroke-width",w);
+        p.setAttribute("stroke-linecap","round"); p.setAttribute("stroke-linejoin","round");
+        svg.appendChild(p);
     }
 
-    /* ════════════════════════════
-       리그전
-    ════════════════════════════ */
+    /* ════════ 리그전 ════════ */
     function buildBothLeagues() {
         const mP = getParticipants('남','absentee-m');
         const fP = getParticipants('여','absentee-f');
         if (mP.length < 2) { showToast("남자부 인원 부족","출전 인원이 2명 미만입니다."); return; }
         if (fP.length < 2) { showToast("여자부 인원 부족","출전 인원이 2명 미만입니다."); return; }
-        buildSingleLeague(mP, 'm');
-        buildSingleLeague(fP, 'f');
-        const mMatches = mP.length*(mP.length-1)/2;
-        const fMatches = fP.length*(fP.length-1)/2;
+        const mRounds = buildLeagueRounds(shuffle([...mP]));
+        const fRounds = buildLeagueRounds(shuffle([...fP]));
+        renderLeague(mRounds, mP.length, 'm');
+        renderLeague(fRounds, fP.length, 'f');
+        const totalM = mRounds.reduce((s,r)=>s+r.matches.length,0);
+        const totalF = fRounds.reduce((s,r)=>s+r.matches.length,0);
         document.getElementById('league-stat-summary').innerText =
-            `남자부 ${mP.length}명 · ${mMatches}경기 / 여자부 ${fP.length}명 · ${fMatches}경기`;
+            `남자부 ${mP.length}명 · ${mRounds.length}라운드 · ${totalM}경기 / 여자부 ${fP.length}명 · ${fRounds.length}라운드 · ${totalF}경기`;
         document.getElementById('output-league').classList.remove('hidden');
         document.getElementById('output-tournament').classList.add('hidden');
         document.getElementById('output-league').scrollIntoView({behavior:'smooth'});
     }
 
-    function buildSingleLeague(participants, suffix) {
-        // 무작위 순서 섞기
-        const shuffled = [...participants];
-        for (let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
+    /*
+     * 원형 스케줄링 알고리즘 (Circle/Polygon Method)
+     * n명이면 n-1라운드, 홀수면 n라운드 (매 라운드 1명 bye)
+     * 각 라운드에서 모든(또는 n-1명) 선수가 동시에 경기
+     */
+    function buildLeagueRounds(players) {
+        const n = players.length;
+        const isOdd = n % 2 !== 0;
+        // 홀수면 가상의 bye 선수를 추가해 짝수로 만듦
+        const list = isOdd ? [...players, {name:'휴식',isBye:true}] : [...players];
+        const m = list.length; // 반드시 짝수
+        const numRounds = m - 1;
+        const rounds = [];
 
-        // 라운드 로빈 경기 순서 생성 (모든 1:1 조합)
-        const matches = [];
-        for (let i=0;i<shuffled.length;i++) {
-            for (let j=i+1;j<shuffled.length;j++) {
-                matches.push([shuffled[i], shuffled[j]]);
+        // 원형 알고리즘: list[0]을 고정, 나머지를 회전
+        const fixed = list[0];
+        const rotating = list.slice(1); // 길이 m-1
+
+        for (let r = 0; r < numRounds; r++) {
+            const matches = [];
+            // 이번 라운드의 배열: [fixed, ...rotating rotated by r]
+            const rot = [...rotating.slice(r), ...rotating.slice(0, r)];
+            const half = m / 2;
+            for (let i = 0; i < half; i++) {
+                const p1 = i === 0 ? fixed : rot[i-1];
+                const p2 = rot[m - 1 - i - 1]; // rot의 대칭 인덱스
+                matches.push([p1, p2]);
             }
+            // bye가 포함된 경기는 제외 (실제 경기만)
+            const realMatches = matches.filter(([a,b]) => !a?.isBye && !b?.isBye);
+            const byePlayer  = matches.flatMap(([a,b])=>[a,b]).find(p=>p?.isBye);
+            // bye 상대는 이번 라운드 휴식자
+            const restPlayer = isOdd ? matches.find(([a,b])=>a?.isBye||b?.isBye)?.find?.(p=>!p?.isBye) : null;
+            rounds.push({ matches: realMatches, rest: restPlayer ?? null });
         }
-
-        const gl = suffix==='m' ? '남자부' : '여자부';
-        const totalMatches = matches.length;
-
-        document.getElementById(`league-title-${suffix}`).innerText =
-            `${currentGrade}학년 ${currentClass}반 배드민턴 리그전 대진표 (${gl})`;
-        document.getElementById(`league-participants-${suffix}`).innerText =
-            `출전 인원: ${shuffled.length}명 · 총 ${totalMatches}경기`;
-
-        // 경기 목록 렌더링 - 4열 그리드
-        const container = document.getElementById(`league-matches-${suffix}`);
-        container.innerHTML = "";
-
-        const cols = matches.length <= 10 ? 2 : matches.length <= 20 ? 3 : 4;
-        const grid = document.createElement('div');
-        grid.className = `grid gap-2`;
-        grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-
-        matches.forEach((match, idx) => {
-            const p1 = match[0], p2 = match[1];
-            const row = document.createElement('div');
-            row.className = "flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 gap-2 min-w-0";
-
-            // 경기 번호
-            const numBadge = document.createElement('span');
-            numBadge.className = "flex-shrink-0 w-7 h-7 rounded-full bg-indigo-600 text-white text-[10px] font-black flex items-center justify-center";
-            numBadge.innerText = idx+1;
-
-            // 선수 1
-            const p1div = document.createElement('div');
-            p1div.className = "flex-1 text-right min-w-0";
-            p1div.innerHTML = `<span class="text-[9px] text-slate-400 font-medium">${p1.num}번</span><br><span class="text-[11px] font-extrabold text-slate-800 truncate block">${p1.name}</span>`;
-
-            // VS
-            const vsDiv = document.createElement('div');
-            vsDiv.className = "flex-shrink-0 text-[9px] font-black text-slate-400 px-1";
-            vsDiv.innerText = "VS";
-
-            // 선수 2
-            const p2div = document.createElement('div');
-            p2div.className = "flex-1 text-left min-w-0";
-            p2div.innerHTML = `<span class="text-[9px] text-slate-400 font-medium">${p2.num}번</span><br><span class="text-[11px] font-extrabold text-slate-800 truncate block">${p2.name}</span>`;
-
-            // 결과 입력칸
-            const resultDiv = document.createElement('div');
-            resultDiv.className = "flex-shrink-0 flex items-center gap-1";
-            resultDiv.innerHTML = `
-                <div class="w-8 h-7 border-b-2 border-slate-300 text-center text-xs font-bold text-slate-500 flex items-end justify-center pb-0.5">승</div>
-                <span class="text-[9px] text-slate-300">:</span>
-                <div class="w-8 h-7 border-b-2 border-slate-300 text-center text-xs font-bold text-slate-500 flex items-end justify-center pb-0.5">패</div>
-            `;
-
-            row.appendChild(numBadge);
-            row.appendChild(p1div);
-            row.appendChild(vsDiv);
-            row.appendChild(p2div);
-            row.appendChild(resultDiv);
-            grid.appendChild(row);
-        });
-
-        container.appendChild(grid);
+        return rounds;
     }
 
-    /* ════════════════════════════
-       인쇄 공통
-    ════════════════════════════ */
-    async function printBothBrackets(mode) {
+    function renderLeague(rounds, playerCount, sx) {
+        const gl = sx==='m' ? '남자부' : '여자부';
+        const totalMatches = rounds.reduce((s,r)=>s+r.matches.length,0);
+        document.getElementById(`league-title-${sx}`).innerText =
+            `${currentGrade}학년 ${currentClass}반 배드민턴 리그전 대진표 (${gl})`;
+        document.getElementById(`league-participants-${sx}`).innerText =
+            `출전 인원: ${playerCount}명 · 총 ${rounds.length}라운드 · ${totalMatches}경기`;
+
+        const container = document.getElementById(`league-rounds-${sx}`);
+        container.innerHTML = "";
+
+        rounds.forEach((round, ri) => {
+            // 라운드 헤더
+            const header = document.createElement('div');
+            header.className = "flex items-center gap-3 mb-2 mt-4 first:mt-0";
+            const badge = document.createElement('span');
+            badge.className = "flex-shrink-0 bg-indigo-600 text-white text-[11px] font-black px-3 py-1 rounded-full";
+            badge.innerText = `${ri+1}라운드`;
+            const line = document.createElement('div');
+            line.className = "flex-1 h-px bg-slate-200";
+            if (round.rest) {
+                const restBadge = document.createElement('span');
+                restBadge.className = "flex-shrink-0 bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-200";
+                restBadge.innerText = `휴식: ${round.rest.num}번 ${round.rest.name}`;
+                header.appendChild(badge); header.appendChild(line); header.appendChild(restBadge);
+            } else {
+                header.appendChild(badge); header.appendChild(line);
+            }
+            container.appendChild(header);
+
+            // 경기 목록: 가로로 나열
+            const matchRow = document.createElement('div');
+            matchRow.className = "flex flex-wrap gap-2 mb-1";
+
+            round.matches.forEach((match, mi) => {
+                const [p1, p2] = match;
+                const card = document.createElement('div');
+                card.className = "flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 shadow-sm";
+
+                // 경기 번호 (라운드 내 순번)
+                const num = document.createElement('span');
+                num.className = "flex-shrink-0 w-5 h-5 rounded-full bg-slate-200 text-slate-600 text-[9px] font-black flex items-center justify-center";
+                num.innerText = mi+1;
+
+                // 선수1
+                const s1 = document.createElement('div');
+                s1.className = "text-right";
+                s1.innerHTML = `<div class="text-[9px] text-slate-400">${p1.num}번</div><div class="text-[12px] font-extrabold text-slate-800 whitespace-nowrap">${p1.name}</div>`;
+
+                // VS
+                const vsEl = document.createElement('div');
+                vsEl.className = "text-[10px] font-black text-slate-400 px-1";
+                vsEl.innerText = "VS";
+
+                // 선수2
+                const s2 = document.createElement('div');
+                s2.className = "text-left";
+                s2.innerHTML = `<div class="text-[9px] text-slate-400">${p2.num}번</div><div class="text-[12px] font-extrabold text-slate-800 whitespace-nowrap">${p2.name}</div>`;
+
+                card.appendChild(num);
+                card.appendChild(s1);
+                card.appendChild(vsEl);
+                card.appendChild(s2);
+                matchRow.appendChild(card);
+            });
+            container.appendChild(matchRow);
+        });
+    }
+
+    /* ════════ 인쇄 ════════ */
+    async function printBoth(mode) {
         const loader = document.getElementById('print-loading');
-        const loadingMsg = document.getElementById('print-loading-msg');
+        const msg    = document.getElementById('print-loading-msg');
         loader.classList.remove('hidden'); loader.classList.add('flex');
         await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
 
-        if (mode === 'tournament') { drawBracketLines('m'); drawBracketLines('f'); }
+        const isLandscape = mode === 'tournament';
+        // 페이지 방향 설정
+        document.querySelectorAll('.print-page').forEach(p => {
+            p.classList.toggle('page-landscape', isLandscape);
+            p.classList.toggle('page-portrait',  !isLandscape);
+        });
 
-        const areaIds = mode === 'tournament'
+        if (isLandscape) { drawBracketLines('m'); drawBracketLines('f'); }
+
+        const areaIds = isLandscape
             ? ['bracket-print-area-m','bracket-print-area-f']
             : ['league-print-area-m','league-print-area-f'];
-        const labels = mode === 'tournament'
-            ? ['남자부 토너먼트 캡처 중...','여자부 토너먼트 캡처 중...']
-            : ['남자부 리그전 캡처 중...','여자부 리그전 캡처 중...'];
+        const labels = isLandscape
+            ? ['남자부 토너먼트 캡처 중…','여자부 토너먼트 캡처 중…']
+            : ['남자부 리그전 캡처 중…','여자부 리그전 캡처 중…'];
 
         try {
             for (let i=0;i<2;i++) {
-                loadingMsg.innerText = labels[i];
+                msg.innerText = labels[i];
                 const canvas = await html2canvas(document.getElementById(areaIds[i]),{
                     scale:2, useCORS:true, backgroundColor:'#ffffff', logging:false
                 });
@@ -1848,19 +1870,24 @@ const studentDatabase = [
         } catch(e) {
             console.error(e);
             loader.classList.add('hidden'); loader.classList.remove('flex');
-            showToast("인쇄 실패","캡처 중 오류가 발생했습니다. 다시 시도해 주세요.");
+            showToast("인쇄 실패","캡처 중 오류가 발생했습니다.");
         }
     }
 
+    /* ── 유틸 ── */
+    function shuffle(arr) {
+        for (let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+        return arr;
+    }
     function showToast(title,msg){
         document.getElementById('toast-title').innerText=title;
         document.getElementById('toast-message').innerText=msg;
         const m=document.getElementById('toast-modal');
-        m.classList.remove('hidden');m.classList.add('flex');
+        m.classList.remove('hidden'); m.classList.add('flex');
     }
     function closeToast(){
         const m=document.getElementById('toast-modal');
-        m.classList.add('hidden');m.classList.remove('flex');
+        m.classList.add('hidden'); m.classList.remove('flex');
     }
 </script>
 </body>
